@@ -1,0 +1,11 @@
+# Windows / editor
+Thumbs.db
+Desktop.ini
+.DS_Store
+.vscode/
+.idea/
+
+# berkas sementara
+*.log
+*.tmp
+*.bak
