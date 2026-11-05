@@ -1,6 +1,6 @@
 /* ==========================================================================
    Pustaka Ceria (SLiMS theme)
-   Template by Tutorial SLiMS - (c) Tutorial SLiMS. All rights reserved.
+   Template by Tutorial SLiMS - (c) Tutorial SLiMS. Licensed under GPLv3.
    ========================================================================== */
 
 :root {
@@ -293,3 +293,50 @@ body.kd-body {
 .kd-footer .kd-contact p { margin: 0 0 6px; color: #c9d1ee; }
 .kd-footer .kd-contact a { display: inline-block; margin: 0 10px; font-weight: 600; }
 .kd-footer .kd-contact a:hover { color: var(--kd-yellow); text-decoration: none; }
+
+
+/* ---- visitor counter (index.php?p=visitor) ------------------------------ */
+.kdv { position: relative; min-height: 100vh; width: 100%; display: flex; align-items: center; justify-content: center; padding: 32px 16px; overflow: hidden;
+    background: radial-gradient(circle at 6% 20%, #ffe9a8 0, transparent 38%), radial-gradient(circle at 95% 10%, #bfe6f3 0, transparent 34%), radial-gradient(circle at 92% 90%, #ffd9cc 0, transparent 38%), radial-gradient(circle at 4% 95%, #cdeed9 0, transparent 30%), #fff7e6; }
+:root[data-theme="dark"] .kdv { background: radial-gradient(circle at 6% 20%, #3a3115 0, transparent 38%), radial-gradient(circle at 95% 10%, #16384a 0, transparent 34%), #151b35; }
+.kdv::before { content: ""; position: absolute; left: 0; right: 0; top: 0; height: 6px; background: var(--kd-rainbow); }
+.kdv-theme { position: absolute; top: 20px; right: 20px; z-index: 3; }
+.kdv-wrap { position: relative; z-index: 2; width: 100%; max-width: 1040px; display: grid; grid-template-columns: minmax(0, 1.05fr) minmax(0, 1fr); gap: 26px; align-items: stretch; }
+.kdv-card { background: var(--kd-surface); border: 1px solid var(--kd-border); border-radius: 26px; padding: 30px 32px; box-shadow: 10px 10px 0 rgba(28, 35, 64, .1), var(--kd-shadow); }
+.kdv-form-card { display: flex; flex-direction: column; align-items: flex-start; }
+.kdv-brand { margin-bottom: 22px; }
+.kdv-brand img { height: 46px; }
+.kdv-brand .kd-brand-text strong { font-size: 18px; }
+.kdv-title { font-size: clamp(26px, 4vw, 38px); font-weight: 800; letter-spacing: -.04em; line-height: 1.1; margin: 0 0 10px; color: var(--kd-text); }
+.kdv-title span { display: inline; color: var(--kd-blue); background: linear-gradient(transparent 70%, var(--kd-yellow) 70% 92%, transparent 92%); padding: 0 4px; -webkit-box-decoration-break: clone; box-decoration-break: clone; }
+.kdv-lead { color: var(--kd-muted); font-size: 16px; margin: 0 0 22px; }
+.kdv-form { width: 100%; }
+.kdv-form label { display: block; font-weight: 700; font-size: 14px; margin: 0 0 6px; color: var(--kd-text); }
+.kdv-field { display: flex; align-items: center; gap: 10px; background: var(--kd-surface); border: 1.5px solid var(--kd-border); border-radius: 14px; padding: 4px 14px; margin-bottom: 16px; box-shadow: inset 0 1px 3px rgba(0, 0, 0, .06); transition: border-color .15s, box-shadow .15s; }
+.kdv-field:focus-within { border-color: var(--kd-blue); box-shadow: 0 0 0 4px var(--kd-blue-soft); }
+.kdv-field i { color: var(--kd-blue); width: 18px; text-align: center; }
+.kdv-field input { flex: 1; min-width: 0; border: 0; outline: none; background: transparent; padding: 12px 0; font-size: 16px; color: var(--kd-text); font-family: inherit; }
+.kdv-field input::placeholder { color: var(--kd-muted); opacity: .8; }
+.kdv-hint { display: block; color: var(--kd-muted); font-size: 13px; margin: -6px 0 20px; }
+.kdv-submit { width: 100%; border: 0; background: var(--kd-yellow); color: #1c2340; font-weight: 800; font-size: 16px; padding: 14px 22px; border-radius: 14px; cursor: pointer; box-shadow: 0 4px 0 #e0a210; display: inline-flex; align-items: center; justify-content: center; gap: 10px; font-family: inherit; }
+.kdv-submit:hover { filter: brightness(1.04); }
+.kdv-submit:active { transform: translateY(2px); box-shadow: 0 2px 0 #e0a210; }
+.kdv-powered { margin-top: auto; padding-top: 24px; width: 100%; text-align: right; font-size: 13px; color: var(--kd-muted); }
+.kdv-powered code { color: var(--kd-blue); background: var(--kd-blue-soft); border-radius: 6px; padding: 1px 6px; }
+.kdv-side-card { position: relative; overflow: hidden; display: flex; align-items: center; justify-content: center; text-align: center; min-height: 320px; }
+.kdv-side-card::before { content: ""; position: absolute; left: 0; right: 0; top: 0; height: 6px; background: var(--kd-rainbow); }
+.kdv-result { display: flex; flex-direction: column; align-items: center; gap: 18px; }
+.kdv-avatar { width: 150px; height: 150px; border-radius: 50%; background: var(--kd-surface); border: 6px solid var(--kd-yellow); box-shadow: var(--kd-shadow); overflow: hidden; }
+.kdv-avatar img { width: 100%; height: 100%; object-fit: cover; }
+.kdv-message { font-size: 22px; font-weight: 700; line-height: 1.35; color: var(--kd-text); margin: 0; }
+.kdv-quote { margin: 0; display: flex; flex-direction: column; align-items: center; gap: 10px; color: var(--kd-muted); }
+.kdv-quote i { color: var(--kd-red); font-size: 28px; }
+.kdv-quote p { font-size: 20px; font-style: italic; color: var(--kd-text); margin: 0; line-height: 1.5; }
+.kdv-quote footer { font-weight: 700; font-size: 14px; color: var(--kd-blue); }
+.kdv-quote footer::before { content: "\2014\00a0"; }
+@media (max-width: 820px) {
+    .kdv { align-items: flex-start; padding-top: 64px; }
+    .kdv-wrap { grid-template-columns: 1fr; }
+    .kdv-card { padding: 24px 22px; }
+    .kdv-side-card { min-height: 200px; }
+}

@@ -56,54 +56,74 @@ if (isset($_GET['select_lang'])) {
 }
 
 ?>
-<div class="<?= $sysconf['template']['classic_library_disableslide'] ? 'vegas-slide c-header' : 'vegas-slide' ?>" style="position: fixed; z-index: -1"></div>
-<div class="flex h-screen w-full" id="visitor-counter" style="background: rgba(0,0,0,0.3)">
-    <div class="bg-white w-full md:w-1/3 px-8 pt-8 pb-3 flex flex-col justify-between">
-        <div>
-            <h3 class="font-light mb-2"><?= __('Welcome to ').$sysconf['library_name']; ?></h3>
-            <p class="lead">
-                <?= __('Please fill your member ID or name.')?>
-            </p>
+<div class="kdv" id="visitor-counter">
+    <i class="fas fa-star kd-deco star1" aria-hidden="true"></i>
+    <i class="fas fa-star kd-deco star2" aria-hidden="true"></i>
+    <span class="kd-deco dot" aria-hidden="true"></span>
+    <span class="kd-deco ring" aria-hidden="true"></span>
+    <span class="kd-deco dots" aria-hidden="true"></span>
 
-            <div v-if="textInfo !== ''" class="rounded p-2 mt-4 bg-blue-lighter text-blue-darker md:hidden">{{textInfo}}</div>
+    <button type="button" class="kd-icon-btn kdv-theme" id="kdv-theme-toggle" aria-label="<?= __('Toggle theme') ?>">
+        <i class="fas fa-moon"></i>
+    </button>
 
-            <form class="mt-4" @submit.prevent="onSubmit">
-                <div class="form-group">
-                    <label for="exampleInputEmail1"><?= __('Member ID')?></label>
-                    <input v-model="memberId" ref="memberId" autofocus type="text" class="form-control" id="exampleInputEmail1"
-                           aria-describedby="emailHelp" placeholder="<?= __('Enter your member ID')?>">
+    <div class="kdv-wrap">
+        <div class="kdv-card kdv-form-card">
+            <a class="kd-brand kdv-brand" href="index.php">
+                <?php
+                // this file is included before login_template.inc.php / classic.php run,
+                // so $imagesDisk and assets() are not available yet
+                $kdvImagesDisk = \SLiMS\Filesystems\Storage::images();
+                if (isset($sysconf['logo_image']) && $sysconf['logo_image'] != '' && $kdvImagesDisk->isExists($path = 'default/' . $sysconf['logo_image'])) {
+                    echo '<img src="' . SWB . 'lib/minigalnano/createthumb.php?filename=images/' . $path . '&width=350" alt="logo">';
+                }
+                ?>
+                <span class="kd-brand-text">
+                    <strong><?= htmlspecialchars($sysconf['library_name']); ?></strong>
+                    <?php if (!empty($sysconf['library_subname'])): ?>
+                        <span><?= htmlspecialchars($sysconf['library_subname']); ?></span>
+                    <?php endif; ?>
+                </span>
+            </a>
+
+            <span class="kd-chip"><i class="fas fa-door-open"></i> <?= __('Visitor Counter') ?></span>
+            <h1 class="kdv-title"><?= __('Welcome to ') ?><span><?= htmlspecialchars($sysconf['library_name']); ?></span></h1>
+            <p class="kdv-lead"><?= __('Please fill your member ID or name.') ?></p>
+
+            <form class="kdv-form" @submit.prevent="onSubmit">
+                <label for="kdv-member"><?= __('Member ID') ?></label>
+                <div class="kdv-field">
+                    <i class="fas fa-id-card"></i>
+                    <input v-model="memberId" ref="memberId" autofocus autocomplete="off" type="text" id="kdv-member"
+                           placeholder="<?= __('Enter your member ID') ?>">
                 </div>
-                <div class="form-group">
-                    <label for="exampleInputPassword1"><?= __('Institution')?></label>
-                    <input v-model="institution" type="text" class="form-control" id="exampleInputPassword1"
-                           placeholder="<?= __('Enter your institution')?>">
-                    <small id="emailHelp" class="form-text text-muted"><?= __('Enough fill your member ID if you are member of ').$sysconf['library_name']; ?></small>
+
+                <label for="kdv-institution"><?= __('Institution') ?></label>
+                <div class="kdv-field">
+                    <i class="fas fa-building"></i>
+                    <input v-model="institution" autocomplete="off" type="text" id="kdv-institution"
+                           placeholder="<?= __('Enter your institution') ?>">
                 </div>
-                <button type="submit" class="btn btn-primary btn-block"><?= __('Check In')?></button>
+                <small class="kdv-hint"><?= __('Enough fill your member ID if you are member of ') . htmlspecialchars($sysconf['library_name']); ?></small>
+
+                <button type="submit" class="kdv-submit"><i class="fas fa-check-circle"></i> <?= __('Check In') ?></button>
             </form>
+
+            <div class="kdv-powered"><?= __('Powered by ') ?> <code>SLiMS</code> &middot; Pustaka Ceria</div>
         </div>
-        <div class="text-right">
-            <small class="text-grey-dark"><?= __('Powered by ')?> <code>SLiMS</code></small>
-        </div>
-    </div>
-    <div class="flex-1 hidden md:block">
-        <div class="h-screen">
-            <div v-show="textInfo !== ''" class="flex items-center h-screen p-8">
-                <div class="w-32">
-                    <div class="w-32 h-32 bg-white rounded-full border-white border-4 shadow">
-                        <img :src="image" alt="image" class="rounded-full" @error="onImageError">
-                    </div>
+
+        <div class="kdv-card kdv-side-card">
+            <div v-show="textInfo !== ''" class="kdv-result">
+                <div class="kdv-avatar">
+                    <img :src="image" alt="image" @error="onImageError">
                 </div>
-                <div class="px-8">
-                    <h3 class="font-light text-white mb-2" v-html="textInfo"></h3>
-                </div>
+                <h3 class="kdv-message" v-html="textInfo"></h3>
             </div>
-            <div class="flex h-screen items-end p-8">
-                <blockquote class="blockquote" v-show="textInfo === ''">
-                    <p class="text-white">{{quotes.content}}</p>
-                    <footer class="blockquote-footer text-grey-light">{{quotes.author}}</footer>
-                </blockquote>
-            </div>
+            <blockquote class="kdv-quote" v-show="textInfo === ''">
+                <i class="fas fa-quote-left"></i>
+                <p>{{quotes.content}}</p>
+                <footer>{{quotes.author}}</footer>
+            </blockquote>
         </div>
     </div>
 </div>
@@ -211,4 +231,19 @@ if (isset($_GET['select_lang'])) {
             }
         }
     })
+
+    // light / dark toggle (shares the 'kd-theme' setting with the rest of the theme)
+    (function () {
+        var btn = document.getElementById('kdv-theme-toggle');
+        if (!btn) return;
+        var root = document.documentElement;
+        function paint() { btn.innerHTML = '<i class="fas ' + (root.getAttribute('data-theme') === 'dark' ? 'fa-sun' : 'fa-moon') + '"></i>'; }
+        paint();
+        btn.addEventListener('click', function () {
+            var next = root.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+            root.setAttribute('data-theme', next);
+            try { localStorage.setItem('kd-theme', next); } catch (e) {}
+            paint();
+        });
+    })();
 </script>
