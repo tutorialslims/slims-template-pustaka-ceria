@@ -5,6 +5,7 @@
  * Email                : tutorialslims@gmail.com
  * Instagram            : https://instagram.com/tutorial_slims (@tutorial_slims)
  * Copyright            : (c) Tutorial SLiMS. Licensed under GPLv3.
+ * Template ini merupakan ide dari Hendro Wicaksono | Email : hendro.wicaksono@gmail.com
  */
 ?>
 <!--
@@ -13,6 +14,7 @@
  * Email                : tutorialslims@gmail.com
  * Instagram            : https://instagram.com/tutorial_slims (@tutorial_slims)
  * Copyright            : (c) Tutorial SLiMS. Licensed under GPLv3.
+ * Template ini merupakan ide dari Hendro Wicaksono | Email : hendro.wicaksono@gmail.com
 -->
 <!--
 # ===============================

@@ -5,6 +5,7 @@
  * Email                : tutorialslims@gmail.com
  * Instagram            : https://instagram.com/tutorial_slims (@tutorial_slims)
  * Copyright            : (c) Tutorial SLiMS. Licensed under GPLv3.
+ * Template ini merupakan ide dari Hendro Wicaksono | Email : hendro.wicaksono@gmail.com
  */
 ?>
 <div class="modal fade" style="position: fixed;top: 30% !important;" id="mediaSocialModal" tabindex="-1" role="dialog" aria-labelledby="mediaSocialModal" aria-hidden="true">

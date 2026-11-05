@@ -5,6 +5,8 @@ Mendukung dua bahasa (Indonesia / English) lewat tombol **ID | EN** di navbar.
 
 Dibuat oleh **Tutorial SLiMS**.
 
+Template ini merupakan ide dari Hendro Wicaksono | Email : hendro.wicaksono@gmail.com
+
 ![Preview Pustaka Ceria](preview.png)
 
 ## Fitur
