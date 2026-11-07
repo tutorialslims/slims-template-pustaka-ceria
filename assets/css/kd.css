@@ -495,6 +495,8 @@ body.kd-body {
 
 /* ---- search suggestion popup ------------------------------------------- */
 .kd-band { position: relative; z-index: 40; }
+/* header (and its dropdown menu) must stay above the hero */
+.kd-header { z-index: 100; }
 .kd-hero { overflow-x: clip; overflow-y: visible; z-index: 20; }
 .kd-search-card { overflow: visible; position: relative; z-index: 5; }
 .kd-sgwrap { position: relative; text-align: left; }
