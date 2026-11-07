@@ -18,6 +18,10 @@
 // extra translations (ID / EN)
 include_once __DIR__ . '/lang.php';
 
+// attribution guard: the support/credit block is always present in the final page
+require_once __DIR__ . '/parts/_credit.php';
+ob_start('kd_credit_guard');
+
 $imagesDisk =\SLiMS\Filesystems\Storage::images();
 
 //$a = get_defined_vars();

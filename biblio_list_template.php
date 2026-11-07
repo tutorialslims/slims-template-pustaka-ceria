@@ -66,6 +66,8 @@ function biblio_list_format($dbs, $biblio_detail, $n, $settings = array(), &$ret
 
     // notes
     $notes = getNotes($dbs, $biblio_id);
+    $kd_has_notes = trim(strip_tags((string)$notes)) !== '';
+    $kd_meta = [];
     $custom_field = '';
     $grid_item_content = '';
     $i = 0;
@@ -75,6 +77,7 @@ function biblio_list_format($dbs, $biblio_detail, $n, $settings = array(), &$ret
         foreach ($settings['custom_fields'] as $field => $field_opts) {
             if ($field_opts[0] == 1) {
                 $field_value = (trim($biblio_detail[$field]??'') !== '' ? $biblio_detail[$field] : '-');
+                $kd_meta[] = [$field_opts[1], $field_value];
                 $custom_field .= '<dt class="col-sm-3">'.$field_opts[1].'</dt><dd class="col-sm-9">'.$field_value.'</dd>';
                 $grid_item_content .= '<li class="list-group-item"><label>'.$field_opts[1].'</label><span class="text-right">'.$field_value.'</span></li>';
                 $i++;
@@ -114,13 +117,23 @@ function biblio_list_format($dbs, $biblio_detail, $n, $settings = array(), &$ret
                 if ($kd_cr[0]) $kd_colls[] = $kd_cr[0];
             }
         }
-        $kd_notes = trim(strip_tags($notes ?? ''));
+        $kd_notes = $kd_has_notes ? trim(strip_tags($notes ?? '')) : '';
+        $kd_meta_html = '';
+        foreach ($kd_meta as $kd_m) {
+            $kd_val = trim(strip_tags((string)$kd_m[1]));
+            $kd_empty = ($kd_val === '' || $kd_val === '-');
+            $kd_cls = (stripos($kd_m[0], 'panggil') !== false || stripos($kd_m[0], 'call') !== false) ? ' call' : '';
+            $kd_meta_html .= '<span class="kd-meta-i' . $kd_cls . ($kd_empty ? ' empty' : '') . '"><em>' . htmlspecialchars(strip_tags($kd_m[0])) . '</em><b>' . ($kd_empty ? '-' : htmlspecialchars($kd_val)) . '</b></span>';
+        }
 
         $output .= '<article id="card-' . $biblio_id . '" class="kd-item item">';
         $output .= '<div class="kd-item-cover"><a href="' . $detail_url . '"><img loading="lazy" src="' . $thumb_url . '" alt="cover" class="' . ($availability > 0 ? '' : 'not-available') . '" title="' . ($availability > 0 ?: __('Items is not available')) . '"/></a></div>';
         $output .= '<div class="kd-item-body">';
         $output .= '<h3><a title="' . __('View record detail description for this title') . '" href="' . $detail_url . '">' . stripslashes(addEllipsis($title, 120)) . '</a></h3>';
         $output .= '<div class="kd-authors">' . $_authors_string . ($kd_year !== '' ? ' <span class="kd-year">' . htmlspecialchars($kd_year) . '</span>' : '') . '</div>';
+        if ($kd_meta_html !== '') {
+            $output .= '<div class="kd-meta">' . $kd_meta_html . '</div>';
+        }
         if ($kd_notes !== '') {
             $output .= '<p class="kd-notes">' . $kd_notes . '</p>';
         }
@@ -129,14 +142,16 @@ function biblio_list_format($dbs, $biblio_detail, $n, $settings = array(), &$ret
         foreach ($kd_colls as $kd_c) {
             $output .= '<span class="kd-tag plain">' . htmlspecialchars($kd_c) . '</span>';
         }
-        $output .= '<span class="kd-tag ' . ($availability > 0 ? 'plain' : 'bad') . '">' . __('Availability') . ': ' . $availability . '</span>';
-        $output .= '<span class="kd-item-actions">';
+        $output .= '</div>'; // -- kd-tags
+        $output .= '</div>'; // -- kd-item-body
+        $output .= '<div class="kd-item-side">';
+        $output .= '<div class="kd-avail ' . ($availability > 0 ? 'ok' : 'no') . '"><span>' . __('Availability') . '</span><b>' . $availability . '</b></div>';
+        $output .= '<div class="kd-item-actions">';
         $output .= '<a class="add-to-chart-button" data-biblio="' . $biblio_id . '" title="' . __('Add to basket') . '"><i class="fas fa-plus"></i></a>';
         $output .= '<a class="openPopUp citationLink" href="' . $cite_url . '" title="' . str_replace('{title}', substr($title, 0, 50), __('Citation for: {title}')) . '" target="_blank">' . __('Cite') . '</a>';
         $output .= '<a href="' . $detail_url . '&MARC=true" title="Download detail data in MARC" target="_blank">MARC</a>';
-        $output .= '</span>';
-        $output .= '</div>'; // -- kd-tags
-        $output .= '</div>'; // -- kd-item-body
+        $output .= '</div>';
+        $output .= '</div>'; // -- kd-item-side
         $output .= '</article>';
 
     else:

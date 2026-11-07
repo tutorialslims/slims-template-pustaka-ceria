@@ -35,6 +35,29 @@ if ($kd_sq) {
   while ($r = $kd_sq->fetch_assoc()) $kd_similar[] = $r;
 }
 
+// availability summary: total copies minus copies currently on loan (from database)
+$kd_total = (int)$kd_db->query('SELECT COUNT(*) FROM item WHERE biblio_id=' . (int)$biblio_id)->fetch_row()[0];
+$kd_lent = (int)$kd_db->query('SELECT COUNT(*) FROM loan AS l INNER JOIN item AS i ON l.item_code=i.item_code WHERE l.is_lent=1 AND l.is_return=0 AND i.biblio_id=' . (int)$biblio_id)->fetch_row()[0];
+$kd_avail = max(0, $kd_total - $kd_lent);
+
+// copies (items) of this record, straight from the database
+$kd_items = [];
+$kd_iq = $kd_db->query('SELECT i.item_code, i.call_number, l.location_name, ct.coll_type_name, st.item_status_name, st.no_loan,
+        (SELECT COUNT(*) FROM loan lo WHERE lo.item_code=i.item_code AND lo.is_lent=1 AND lo.is_return=0) AS on_loan
+    FROM item i
+    LEFT JOIN mst_location l ON l.location_id=i.location_id
+    LEFT JOIN mst_coll_type ct ON ct.coll_type_id=i.coll_type_id
+    LEFT JOIN mst_item_status st ON st.item_status_id=i.item_status_id
+    WHERE i.biblio_id=' . (int)$biblio_id . ' ORDER BY i.item_code');
+if ($kd_iq) {
+  while ($r = $kd_iq->fetch_assoc()) {
+    if ((int)$r['on_loan'] > 0) { $r['_cls'] = 'loan'; $r['_label'] = __('On Loan'); }
+    elseif (!empty($r['item_status_name'])) { $r['_cls'] = 'no'; $r['_label'] = $r['item_status_name']; }
+    else { $r['_cls'] = 'ok'; $r['_label'] = __('Available'); }
+    $kd_items[] = $r;
+  }
+}
+
 $kd_row = function ($label, $value, $class = '') {
   if ($value === null || trim(strip_tags((string)$value)) === '') return;
   echo '<dt>' . $label . '</dt><dd class="' . $class . '">' . $value . '</dd>';
@@ -50,7 +73,16 @@ $kd_row = function ($label, $value, $class = '') {
                 <?php if (!empty($publish_year)): ?><span class="kd-tag plain"><?= $publish_year ?></span><?php endif; ?>
             </div>
 
-            <div class="kd-cover"><?= $image; ?></div>
+            <div class="kd-cover">
+                <?= $image; ?>
+                <div class="kd-avail-box <?= $kd_avail > 0 ? 'ok' : 'no' ?>">
+                    <span><?= __('Availability') ?></span>
+                    <strong><?= $kd_avail === 1 ? __('1 Item') : sprintf(__('%d Items'), $kd_avail) ?></strong>
+                </div>
+                <a class="kd-side-btn openPopUp citationLink" href="index.php?p=cite&id=<?= (int)$biblio_id ?>" title="<?= str_replace('{title}', htmlspecialchars(substr(strip_tags($title), 0, 50)), __('Citation for: {title}')) ?>" target="_blank"><?= __('Cite This Collection') ?></a>
+                <a class="kd-side-btn" href="index.php?p=show_detail&id=<?= (int)$biblio_id ?>&MARC=true" target="_blank"><?= __('Download MARC') ?></a>
+                <a class="kd-side-btn" href="index.php?p=show_detail&id=<?= (int)$biblio_id ?>&JSONLD=true" target="_blank"><?= __('View JSON Record') ?></a>
+            </div>
 
             <h1><?= stripslashes($title); ?></h1>
             <div class="kd-byline"><?= str_replace('<br />', '; ', $authors); ?></div>
@@ -63,36 +95,78 @@ $kd_row = function ($label, $value, $class = '') {
                 <a href="index.php?p=show_detail&id=<?= $biblio_id ?>&MARC=true" target="_blank">MARC</a>
             </div>
 
+            <div class="kd-avail-left">
+                <div class="kd-note-box"><?= trim(strip_tags((string)$notes)) !== '' ? $notes : __('No additional notes / abstract for this collection.') ?></div>
+                <div class="kd-sub-h"><?= __('Availability'); ?></div>
+                <?php if ($kd_items): ?>
+                <div class="kd-items-wrap">
+                    <table class="kd-items">
+                        <thead><tr>
+                            <th><?= __('Barcode / Item Code') ?></th><th><?= __('Call No.') ?></th><th><?= __('Location & Collection') ?></th><th><?= __('Status') ?></th>
+                        </tr></thead>
+                        <tbody>
+                        <?php foreach ($kd_items as $it): ?>
+                            <tr>
+                                <td><code><?= htmlspecialchars($it['item_code']) ?></code></td>
+                                <td><?= htmlspecialchars($it['call_number'] ?: ($call_number ?? '')) ?></td>
+                                <td><?= htmlspecialchars($it['location_name'] ?: '-') ?><?= $it['coll_type_name'] ? ' (' . htmlspecialchars($it['coll_type_name']) . ')' : '' ?></td>
+                                <td><span class="kd-st <?= $it['_cls'] ?>"><?= htmlspecialchars($it['_label']) ?></span></td>
+                            </tr>
+                        <?php endforeach; ?>
+                        </tbody>
+                    </table>
+                </div>
+                <?php else: ?>
+                    <p class="text-muted"><?= __('No copy data') ?></p>
+                <?php endif; ?>
+            </div>
             <div style="clear:both"></div>
+
             <div class="kd-label-h"><?= __('Detail'); ?></div>
+            <?php
+            // every field is always shown; empty values become "-"
+            $kd_v = function ($v) {
+              $t = trim(strip_tags((string)$v));
+              return $t === '' ? '-' : htmlspecialchars($t);
+            };
+            $kd_place_year = trim(trim((string)$publish_place) . ((string)$publish_year !== '' ? ', ' . $publish_year : ''), ', ');
+            $kd_loc = '';
+            foreach ($kd_items as $it) { if (trim((string)$it['location_name']) !== '') { $kd_loc = $it['location_name']; break; } }
+            $kd_lu_q = $kd_db->query('SELECT last_update FROM biblio WHERE biblio_id=' . (int)$biblio_id);
+            $kd_lu = $kd_lu_q ? ($kd_lu_q->fetch_row()[0] ?? '') : '';
+            $kd_fields = [
+              ['Series Title', $kd_v($series_title)],
+              ['Call Number', trim((string)$call_number) !== '' ? '<span class="kd-mono-b">' . $kd_v($call_number) . '</span>' : '-'],
+              ['Publisher', $kd_v($publisher_name)],
+              ['Place & Year Published', $kd_v($kd_place_year)],
+              ['Edition', $kd_v($edition)],
+              ['Physical Description (Collation)', $kd_v($collation)],
+              ['ISBN / ISSN', trim((string)$isbn_issn) !== '' ? '<span class="kd-mono-n">' . $kd_v($isbn_issn) . '</span>' : '-'],
+              ['Classification', $kd_v($classification)],
+              ['Language', $kd_v($language_name)],
+              ['Shelf Location', $kd_v($kd_loc)],
+              ['Specific Detail Info', $kd_v($spec_detail_info)],
+              ['Last Updated', $kd_v($kd_lu)],
+            ];
+            ?>
+            <div class="kd-fields">
+                <?php foreach ($kd_fields as $f): ?>
+                    <div class="kd-field"><span><?= __($f[0]) ?></span><b><?= $f[1] ?></b></div>
+                <?php endforeach; ?>
+            </div>
+
             <dl class="kd-dl">
                 <?php
-                $kd_row(__('Author'), str_replace('<br />', '<br>', $authors));
-                $kd_row(__('Year'), $publish_year);
-                $kd_row(__('Type'), $gmd_name);
-                $kd_row(__('Series Title'), $series_title);
-                $kd_row(__('Edition'), $edition);
-                $kd_row(__('Publisher'), trim(($publish_place ? $publish_place . ' : ' : '') . $publisher_name));
-                $kd_row(__('Collation'), $collation);
-                $kd_row(__('Language'), $language_name);
                 $kd_row(__('Subject(s)'), $subjects ? '<div class="s-subject">' . $subjects . '</div>' : '');
-                $kd_row(__('Abstract / Description'), $notes, 'abs');
-                $kd_row(__('Call Number'), $call_number);
-                $kd_row(__('Classification'), $classification);
                 $kd_row(__('Content Type'), $content_type);
                 $kd_row(__('Media Type'), $media_type);
                 $kd_row(__('Carrier Type'), $carrier_type);
-                $kd_row(__('Specific Detail Info'), $spec_detail_info);
                 $kd_row(__('Statement of Responsibility'), $sor);
-                $kd_row(__('ISBN/ISSN'), $isbn_issn ? '<span class="kd-mono">' . $isbn_issn . '</span>' : '');
                 if (!empty($biblio_custom)) {
                   foreach ($biblio_custom as $item) $kd_row($item['label'], $item['value']);
                 }
                 ?>
             </dl>
-
-            <div class="kd-sub-h"><?= __('Availability'); ?></div>
-            <?= ($availability) ? $availability : '<p class="text-muted">' . __('No copy data') . '</p>'; ?>
 
             <?php if (!empty($related)): ?>
                 <div class="kd-sub-h"><?= __('Other version/related'); ?></div>

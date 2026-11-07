@@ -34,14 +34,9 @@
             &middot; <?= __('Template by'); ?> <strong>Tutorial SLiMS</strong>
         </div>
     </div>
-    <div class="kd-container kd-contact">
-        <p><?= __('Whatever your SLiMS error problem is, we are ready to help, please DM us on Instagram.'); ?></p>
-        <p>
-            <a href="mailto:tutorialslims@gmail.com"><i class="fas fa-envelope"></i> tutorialslims@gmail.com</a>
-            <a target="_blank" rel="noopener" href="https://instagram.com/tutorial_slims"><i class="fab fa-instagram"></i> @tutorial_slims</a>
-        </p>
-    </div>
+    <?php require_once __DIR__ . '/_credit.php'; echo kd_credit_html(); ?>
 </footer>
+<script src="<?= assets('js/kd-credit.js'); ?>"></script>
 
 <?php if ($sysconf['chat_system']['enabled'] && $sysconf['chat_system']['opac']) : ?>
     <div id="show-pchat2" style="position: fixed; bottom: 16px; right: 16px" class="shadow rounded">

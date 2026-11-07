@@ -68,10 +68,29 @@ Apapun masalah error SLiMS, kami siap membantu, silakan DM ke Instagram.
 - Email: tutorialslims@gmail.com
 - Instagram: [@tutorial_slims](https://instagram.com/tutorial_slims)
 
+## Atribusi (wajib dipertahankan)
+
+Template ini membawa blok atribusi dan kontak di bagian bawah halaman (footer):
+
+> Apapun masalah error SLiMS, kami siap membantu, silakan DM ke Instagram.
+> tutorialslims@gmail.com · @tutorial_slims
+
+Syarat tambahan sesuai GPLv3 pasal 7(b) (pelestarian atribusi penulis dan pemberitahuan hukum):
+
+1. Blok atribusi/kontak di footer, tulisan "Template by Tutorial SLiMS", serta komentar
+   hak cipta di bagian atas setiap berkas **tidak boleh dihapus, disembunyikan, atau diubah**.
+2. Jika Anda membagikan ulang template ini (asli maupun hasil modifikasi), atribusi tersebut
+   harus tetap ada dan terlihat.
+3. Anda tetap bebas mengubah desain, warna, tata letak, dan fitur lainnya.
+
+Kode di `parts/_credit.php`, `assets/js/kd-credit.js`, dan `index_template.inc.php` berfungsi
+menjaga blok ini tetap tampil. Menghapus atau menonaktifkannya berarti melanggar ketentuan di atas.
+
 ## Lisensi
 
 © Tutorial SLiMS.
 
-Template ini dirilis di bawah **GNU General Public License v3.0 (GPLv3)**, sama seperti SLiMS.
+Template ini dirilis di bawah **GNU General Public License v3.0 (GPLv3)**, sama seperti SLiMS,
+dengan syarat tambahan pelestarian atribusi pada bagian **Atribusi** di atas.
 Anda bebas menggunakan, mengubah, dan membagikan ulang sesuai ketentuan GPLv3.
 Lihat berkas [LICENSE](LICENSE) untuk teks lengkapnya.
